@@ -6,6 +6,7 @@ export type {Fragment, JsonFragment}
 export const ERC20Coder = new Web3ABICoder(ERC20ABI)
 export const ERC721Coder = new Web3ABICoder(ERC721ABI)
 export const ERC1155Coder = new Web3ABICoder(ERC1155ABI)
+export {getTransactionByHash, getTransactionReceipt, getBlockByNumber, fetchRPC} from "./src/rpc"
 
 
 
