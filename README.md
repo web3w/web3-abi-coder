@@ -1,24 +1,23 @@
 # Web3 ABI Coder
-
 Utils that encodes and decodes transactions and logs for evm.
 
 ## Motivation
-
 To solve the problem of unreadable web3.js and Ethers decoder data.
 
 ## Features
-
 * Readable result
-* Function coding
-* Event coding
+* Input data decode
+* Logs decode
 * ERC20Coder,ERC721Coder, ERC1155Coder
+* Block tx decode
+* Receipt decode
 
 ## Installation
 
-`npm install web-abi-coder`
+`npm i web3-abi-coder`
 
 ## Example
-
+### decodeInput
 ```ts
 import {Web3ABICoder,ERC20Coder} from 'web3-abi-coder';
 import Seaport from "./abi/Seaport.json"
@@ -36,6 +35,7 @@ const decodeData = seaCoder.decodeInput(inputData)
 */
 ```
 
+### decodeLog
 ```ts
 
 const erc20Log = {
@@ -76,15 +76,86 @@ console.log(transferValue)
 
 ```
 
-## API
+### decodeBlock
+```ts
+import {fetchData} from "./utlis/fetchData";
+import Seaport from "./abi/Seaport.json"
+import {ERC1155ABI, ERC721ABI, ERC20Coder} from 'web3-abi-coder';
+ 
+const coder = ERC20Coder.addABI(ERC721ABI).addABI(ERC1155ABI).addABI(Seaport.abi)
+const {result: block} = await fetchData("block")
+console.log(coder.decodeBlock(block))
+/*
+[
+  {
+    name: 'approve',
+    type: 'function',
+    values: {
+      spender: '0xf2450ae4A2FEdC654C48f5FC1FdF596D05007761',
+      amount: '200000000000000000000'
+    },
+    hash: '0x7f6c78ecac73137076d10429905c5c45b47bde030035f614601a3a1983c2e822'
+  },
+  {
+    name: 'fulfillAdvancedOrder',
+    type: 'function',
+    values: {
+      advancedOrder: [Object],
+      criteriaResolvers: [],
+      fulfillerConduitKey: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      recipient: '0xcBE352f2559fe4209DDa6Ee2779cE254d2347d91'
+    },
+    hash: '0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6'
+  },
+  ...
+]
+* */
+```
 
+### decodeReceipt
+```ts
+ const coder = ERC20Coder.addABI(ERC721ABI).addABI(ERC1155ABI).addABI(Seaport.abi)
+ const {result: receipt} = await fetchData("receipt")
+ console.log(coder.decodeReceipt(receipt)) 
+/*[
+  {
+    name: 'Transfer',
+    type: 'event',
+    values: {
+      from: '0x9226f7dF5E316df051F0490cE3b753c51695D0Bb',
+      to: '0xcBE352f2559fe4209DDa6Ee2779cE254d2347d91',
+      amount: '1'
+    },
+    hash: '0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6'
+  },
+  {
+    name: 'OrderFulfilled',
+    type: 'event',
+    values: {
+      orderHash: '0xf9fc6150b8befdda825b0e6bdd8723105e010b32c67b1c2f9fc5b053d55b3d70',
+      offerer: '0x9226f7dF5E316df051F0490cE3b753c51695D0Bb',
+      zone: '0x00000000E88FE2628EbC5DA81d2b3CeaD633E89e',
+      recipient: '0xcBE352f2559fe4209DDa6Ee2779cE254d2347d91',
+      offer: [Array],
+      consideration: [Array]
+    },
+    hash: '0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6'
+  }
+]
+*/
+```
+## API 
 * Web3ABICoder(abi) extends Interface
+    * abi
+        * addABI(abi: ReadonlyArray<Fragment | JsonFragment>): Web3ABICoder
+        * ...abiCoder
     * utils
         * getFunctionName(sighash: string):string
-        * getFunctionSelector(name: string):string
-        * getFunctionSelectors():{name:string,sighash:string}[]
-        * getFunctionSignature(nameOrSighash: string, type?: "minimal" | "json" | "full"): string
+        * getFunctionSelector(name: string): { name: string, signature: string, sighash: string }[]
+        * getFunctionSelectors(): { name: string, signature: string, sighash: string }[]
+        * getFunctionSignature(name: string, type?: "minimal" | "json" | "full"): string[]
         * getEvent(nameOrSignatureOrTopic: string): EventFragment
+        * getEvents(): { name: string, signature: string, topic: string }
         * ...Interface
     * decoding
         * decodeLog(log: { topics: string[], data: string })

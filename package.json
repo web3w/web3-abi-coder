@@ -1,19 +1,14 @@
 {
   "name": "web3-abi-coder",
-  "version": "1.0.1",
-  "description": "Javascript SDK for web3 accounts ",
+  "version": "1.0.3",
+  "description": "Javascript SDK for web3 abi coder ",
   "main": "lib/index.js",
   "type": "lib/index.d.ts",
   "author": "Web3 Project Developers",
   "scripts": {
     "release": "tsc && npm publish",
     "dev:tsc": "tsc -w -p tsconfig.json",
-    "eslint": "eslint --fix src --ext .ts --max-warnings=0",
-    "build:node": "webpack -c config/webpack.node.config.js",
-    "build:web": "webpack -c config/webpack.config.js",
-    "start": "webpack --watch",
-    "dev": "webpack serve --open -c config/webpack.config.js",
-    "link": "sudo npm link web3-wallets"
+    "link": "sudo npm link web3-abi-coder"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.6.3"
