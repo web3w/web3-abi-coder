@@ -44,6 +44,8 @@ export function bnToString(obj: object) {
     return res
 }
 
+export type DecodeResult<T> = { name?: string, type: string, hash?: string, values: T }
+
 export class Web3ABICoder extends Interface {
     public abiCode: AbiCoder
 
@@ -99,7 +101,7 @@ export class Web3ABICoder extends Interface {
 
     // const seaEvent = seaportCoder.getEvent(seaportlog.topics[0])
 
-    decodeLog(log: { topics: string[], data: string }) {
+    decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T> {
         if (log.topics.length < 2) throw new Error("Topics data is incorrect: " + log.topics)
         const topicId = log.topics[0]
         const event = this.getEvent(topicId)
@@ -114,32 +116,32 @@ export class Web3ABICoder extends Interface {
         }
         const decodeData = this.decodeEventLog(event, log.data, log.topics)
         const values = bnToString(decodeData)
-        return {name: event.name, type: event.type, values}
+        return {name: event.name, type: event.type, values: <T>values}
     }
 
     encodeInput(nameOrSighash: string, inputs: any[]): string {
         return this.encodeFunctionData(nameOrSighash, inputs)
     }
 
-    decodeInput(inputData: string) {
+    decodeInput<T>(inputData: string): DecodeResult<T> {
         if (inputData.length < 10) throw new Error("Input data is incorrect: " + inputData)
         const sighash = inputData.substring(0, 10)
         const func = this.getFunction(sighash)
         if (!func) throw new Error("The ABI has no matching function:" + sighash)
         const decodeData = this.decodeFunctionData(func.name, inputData)
         const values = bnToString(decodeData);
-        return {name: func.name, type: func.type, values}
+        return {name: func.name, type: func.type, values: <T>values}
     }
 
-    decodeOutput(nameOrSighash: string, outputData: string) {
+    decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T> {
         const func = this.getFunction(nameOrSighash)
         if (!func) throw new Error("The ABI has no matching function:")
         const decodeData = this.decodeFunctionResult(func.name, outputData)
         const values = bnToString(decodeData)
-        return {name: func.name, type: func.type, values}
+        return {name: func.name, type: func.type, values: <T>values}
     }
 
-    decodeReceipt(receipt) {
+    decodeReceipt<T>(receipt): DecodeResult<T>[] {
         const evetns = this.getEvents()
         const validLogs = receipt.logs.filter(log => {
             if (log.topics.length > 0) {
@@ -150,16 +152,10 @@ export class Web3ABICoder extends Interface {
             }
         })
 
-        return validLogs.map(log => {
-            const topic = log.topics[0]
-            const coderFunc = this.getEvents().find(val => val.topic == topic)
-            if (coderFunc) {
-                return {...this.decodeLog(log), hash: log.transactionHash}
-            }
-        })
+        return validLogs.map(log => ({...this.decodeLog(log), hash: log.transactionHash}))
     }
 
-    decodeBlock(block) {
+    decodeBlock<T>(block): DecodeResult<T>[] {
         const funcIds = this.getFunctionSelectors()
         const validInputs = block.transactions.filter(tx => {
             if (tx.input.length > 10) {
@@ -169,13 +165,18 @@ export class Web3ABICoder extends Interface {
                 return false
             }
         })
-        return validInputs.map(tx => {
-            const methodId = tx.input.substring(0, 10)
-            const coderFunc = this.getFunctionSelectors().find(val => val.sighash == methodId)
-            if (coderFunc) {
-                return {...this.decodeInput(tx.input), hash: tx.hash}
-            }
-        })
+        return validInputs.map(tx => ({...this.decodeInput(tx.input), hash: tx.hash}))
+    }
+
+    decodeConstructor<T>(data: string): DecodeResult<T> {
+        const hex = data.substring(0, 2)
+        if (hex == "00") {
+            data = "0x" + data
+        }
+        const params = this.abiCode.decode(this.deploy.inputs, data)
+        const values = <T>bnToString(params)
+
+        return {name: "", type: 'constructor', values};
     }
 
 }

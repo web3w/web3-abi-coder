@@ -173,14 +173,17 @@ console.log(transferValue)
         * getEvents(): { name: string, signature: string, topic: string }
         * ...Interface
     * decoding
-        * decodeLog(log: { topics: string[], data: string })
-        * decodeInput(inputData: string)
-        * decodeOutput(nameOrSighash: string, outputData: string)
+        * decodeConstructor<T>(data: string): DecodeResult<T>
+        * decodeInput<T>(inputData: string): DecodeResult<T>
+        * decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T>
+        * decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T>
+        * decodeBlock<T>(block): DecodeResult<T>[]
+        * decodeReceipt<T>(receipt): DecodeResult<T>[]
         * ...Interface
     * encoding
         * encodeInput(nameOrSighash: string, inputs: any[])
         * ...Interface
-    * rpc
-        * async function getBlockByNumber(blockNum: number, url?: string)
-        * async function getTransactionByHash(txHash: string, url?: string)
-        * async function getTransactionReceipt(txHash: string, url?: string)
+* Rpc function
+    * async function getBlockByNumber(blockNum: number, url?: string)
+    * async function getTransactionByHash(txHash: string, url?: string)
+    * async function getTransactionReceipt(txHash: string, url?: string)
