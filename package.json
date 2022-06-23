@@ -6,7 +6,7 @@
   "type": "lib/index.d.ts",
   "author": "Web3 Project Developers",
   "scripts": {
-    "release": "tsc && npm publish",
+    "release": "tsc && npm publish && git tag $npm_package_version && git push --tag",
     "dev:tsc": "tsc -w -p tsconfig.json",
     "link": "sudo npm link web3-abi-coder"
   },
