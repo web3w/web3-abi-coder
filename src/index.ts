@@ -6,11 +6,12 @@ export function bnToString(obj: object) {
     let res = {}
     if (Array.isArray(obj) && obj.length == 0) return []
     for (let key in obj) {
-        // if (key == 'tokenIds') {
+        // if (key == 'x') {
         //     debugger
         // }
         // @ts-ignore
         const values = Object.values(obj)
+
         // @ts-ignore
         if (obj.length > 0 && values.length == obj.length) {
             const items = []
@@ -20,9 +21,13 @@ export function bnToString(obj: object) {
                     // @ts-ignore
                     items.push(item.toString())
                 } else {
-                    // @ts-ignore
-                    items.push(bnToString(item))
-                    //item._isBigNumber ? item.toString() :
+                    if(typeof item == 'string' || typeof item == 'number'){
+                        // @ts-ignore
+                        items.push(item)
+                    }else {
+                        // @ts-ignore
+                        items.push(bnToString(item))
+                    }
                 }
 
             }
@@ -32,7 +37,6 @@ export function bnToString(obj: object) {
         if (Number(key) < obj.length) continue
         if (typeof (obj[key]) == "object") {
             if (obj[key]._isBigNumber) {
-                //
                 res[key] = obj[key].toString()
             } else {
                 res[key] = bnToString(obj[key]);
@@ -141,20 +145,6 @@ export class Web3ABICoder extends Interface {
         return {name: func.name, type: func.type, values: <T>values}
     }
 
-    decodeReceipt<T>(receipt): DecodeResult<T>[] {
-        const evetns = this.getEvents()
-        const validLogs = receipt.logs.filter(log => {
-            if (log.topics.length > 0) {
-                const topic = log.topics[0]
-                return evetns.find(val => val.topic == topic) ? true : false
-            } else {
-                return false
-            }
-        })
-
-        return validLogs.map(log => ({...this.decodeLog(log), hash: log.transactionHash}))
-    }
-
     decodeBlock<T>(block): DecodeResult<T>[] {
         const funcIds = this.getFunctionSelectors()
         const validInputs = block.transactions.filter(tx => {
@@ -168,6 +158,25 @@ export class Web3ABICoder extends Interface {
         return validInputs.map(tx => ({...this.decodeInput(tx.input), hash: tx.hash}))
     }
 
+    decodeTransaction<T>(transaction): DecodeResult<T> {
+        return this.decodeInput(transaction.input)
+    }
+
+
+    decodeTransactionReceipt<T>(receipt): DecodeResult<T>[] {
+        const evetns = this.getEvents()
+        const validLogs = receipt.logs.filter(log => {
+            if (log.topics.length > 0) {
+                const topic = log.topics[0]
+                return evetns.find(val => val.topic == topic) ? true : false
+            } else {
+                return false
+            }
+        })
+
+        return validLogs.map(log => ({...this.decodeLog(log), hash: log.transactionHash}))
+    }
+
     decodeConstructor<T>(data: string): DecodeResult<T> {
         const hex = data.substring(0, 2)
         if (hex == "00") {
@@ -175,7 +184,6 @@ export class Web3ABICoder extends Interface {
         }
         const params = this.abiCode.decode(this.deploy.inputs, data)
         const values = <T>bnToString(params)
-
         return {name: "", type: 'constructor', values};
     }
 

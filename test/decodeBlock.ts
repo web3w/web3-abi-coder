@@ -7,7 +7,7 @@ import {getBlockByNumber, getTransactionReceipt} from "../src/rpc";
     const blockNum = 10862111 //"0xa5be1f"
     const coder = ERC20Coder.addABI(ERC721ABI).addABI(ERC1155ABI).addABI(Seaport.abi)
     const {result: receipt} = await getTransactionReceipt(txHash)
-    console.log(coder.decodeReceipt(receipt))
+    console.log(coder.decodeTransactionReceipt(receipt))
     const {result: block} = await getBlockByNumber(blockNum)
     console.log(coder.decodeBlock(block))
 })()

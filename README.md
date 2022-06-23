@@ -21,59 +21,14 @@ To solve the problem of unreadable web3.js and Ethers decoder data.
 
 ## Example
 
-### decodeInput
-
-```ts
-import {Web3ABICoder, ERC20Coder} from 'web3-abi-coder';
-import Seaport from "./abi/Seaport.json"
-
-const seaCoder = new Web3ABICoder(Seaport.abi)
-const inputData = seaCoder.encodeInput("getCounter", ["0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401"])
-const func = seaCoder.getFunctionName(inputData.substring(0, 10))
-const decodeData = seaCoder.decodeInput(inputData)
-/*
-{
-  name: 'getCounter',
-  type: 'function',
-  values: { offerer: '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401' }
-}
-
-*/
-```
-
-### decodeLog
-
-```ts
-
-const erc20Log = {
-    data: "0x0000000000000000000000000000000000000000000000370c9b5ef669c35300",
-    topics: [
-        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-        '0x000000000000000000000000b5cfcb4d4745cbbd252945856e1b6eaadcf2fc4e',
-        '0x000000000000000000000000694c6aea9444876d4fa9375fc9089c370f8e9eda',
-    ]
-} 
-const erc20LogData = ERC20Coder.decodeLog(erc20Log)
-console.log(erc20LogData)
-/*
-{
-  name: 'Transfer',
-  type: 'event',
-  values: {
-    from: '0xb5CFcb4D4745cBBD252945856E1B6eaadCf2fC4E',
-    to: '0x694c6aea9444876d4fA9375fC9089C370F8E9edA',
-    value: '1015479348216300000000'
-  }
-}
-*/ 
-```
-
 ### decodeBlock
 
 ```ts
-import {fetchData} from "./utlis/fetchData";
+import {
+    ERC1155ABI, ERC721ABI, ERC20Coder,
+    getBlockByNumber, getTransactionByHash, getTransactionReceipt
+} from 'web3-abi-coder';
 import Seaport from "./abi/Seaport.json"
-import {ERC1155ABI, ERC721ABI, ERC20Coder, getBlockByNumber, getTransactionReceipt} from 'web3-abi-coder';
 
 const blockNum = 10862111 //"0xa5be1f"
 const coder = ERC20Coder.addABI(ERC721ABI).addABI(ERC1155ABI).addABI(Seaport.abi)
@@ -106,13 +61,43 @@ console.log(coder.decodeBlock(block))
 * */
 ```
 
-### decodeReceipt
+### decodeTransaction
+
+```ts
+const txHash = "0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6"
+const txData = await getTransactionByHash(txHash)
+const decodeData = seaportCoder.decodeTransaction(txData.result)
+/*{
+  "name": "fulfillAdvancedOrder",
+  "type": "function",
+  "values": {
+    "advancedOrder": {
+      "parameters": {
+        "offerer": "0x9226f7dF5E316df051F0490cE3b753c51695D0Bb",
+        "zone": "0x00000000E88FE2628EbC5DA81d2b3CeaD633E89e",
+        "offer": [
+          {
+            "itemType": 2,
+            "token": "0x1878AaD5E60704f3DEc1F46bcFbf632055FCDD18",
+            "identifierOrCriteria": "1",
+            "startAmount": "1",
+            "endAmount": "1"
+          }
+        ]..
+      }..
+    }
+    ....
+}
+*/
+```
+
+### decodeTransactionReceipt
 
 ```ts
 const txHash = "0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6"
 const coder = ERC20Coder.addABI(ERC721ABI).addABI(ERC1155ABI).addABI(Seaport.abi)
 const {result: receipt} = await getTransactionReceipt(txHash)
-console.log(coder.decodeReceipt(receipt))
+console.log(coder.decodeTransactionReceipt(receipt))
 /*[
   {
     name: 'Transfer',
@@ -139,6 +124,52 @@ console.log(coder.decodeReceipt(receipt))
   }
 ]
 */
+```
+
+### decodeInput
+```ts
+import {Web3ABICoder, ERC20Coder} from 'web3-abi-coder';
+import Seaport from "./abi/Seaport.json"
+
+const seaCoder = new Web3ABICoder(Seaport.abi)
+const inputData = seaCoder.encodeInput("getCounter", ["0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401"])
+const func = seaCoder.getFunctionName(inputData.substring(0, 10))
+const decodeData = seaCoder.decodeInput(inputData)
+/*
+{
+  name: 'getCounter',
+  type: 'function',
+  values: { offerer: '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401' }
+}
+
+*/
+```
+
+### decodeLog
+
+```ts
+
+const erc20Log = {
+    data: "0x0000000000000000000000000000000000000000000000370c9b5ef669c35300",
+    topics: [
+        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+        '0x000000000000000000000000b5cfcb4d4745cbbd252945856e1b6eaadcf2fc4e',
+        '0x000000000000000000000000694c6aea9444876d4fa9375fc9089c370f8e9eda',
+    ]
+}
+const erc20LogData = ERC20Coder.decodeLog(erc20Log)
+console.log(erc20LogData)
+/*
+{
+  name: 'Transfer',
+  type: 'event',
+  values: {
+    from: '0xb5CFcb4D4745cBBD252945856E1B6eaadCf2fC4E',
+    to: '0x694c6aea9444876d4fA9375fC9089C370F8E9edA',
+    value: '1015479348216300000000'
+  }
+}
+*/ 
 ```
 
 ### encodeInput
@@ -173,12 +204,13 @@ console.log(transferValue)
         * getEvents(): { name: string, signature: string, topic: string }
         * ...Interface
     * decoding
+        * decodeBlock<T>(block): DecodeResult<T>[]
+        * decodeTransaction<T>(transaction): DecodeResult<T>[]
+        * decodeTransactionReceipt<T>(receipt): DecodeResult<T>[]
         * decodeConstructor<T>(data: string): DecodeResult<T>
         * decodeInput<T>(inputData: string): DecodeResult<T>
         * decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T>
         * decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T>
-        * decodeBlock<T>(block): DecodeResult<T>[]
-        * decodeReceipt<T>(receipt): DecodeResult<T>[]
         * ...Interface
     * encoding
         * encodeInput(nameOrSighash: string, inputs: any[])

@@ -1,7 +1,7 @@
 {
   "name": "web3-abi-coder",
-  "version": "1.1.1",
-  "description": "Javascript SDK for web3 abi coder ",
+  "version": "1.1.4",
+  "description": "The best ABI Coder tool",
   "main": "lib/index.js",
   "type": "lib/index.d.ts",
   "author": "Web3 Project Developers",
@@ -20,5 +20,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "watch": "webpack --watch"
+  "watch": "tsc --watch"
 }

@@ -12,7 +12,7 @@ import {getTransactionByHash, getTransactionReceipt} from "../src/rpc";
     const inputData = txData.result.input
     const funcName = seaportCoder.getFunctionName(inputData.substring(0, 10))
     console.log("--------Seaport Function Name", funcName)
-    const decodeData = seaportCoder.decodeInput(inputData)
+    const decodeData = seaportCoder.decodeTransaction(txData.result)
     console.log(JSON.stringify(decodeData, null, 2))
 
     const data = await getTransactionReceipt(txHash)
