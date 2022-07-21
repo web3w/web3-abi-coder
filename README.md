@@ -1,5 +1,6 @@
 # Web3 ABI Coder
 
+
 Utils that encodes and decodes transactions and logs for evm.
 
 ## Motivation
@@ -209,6 +210,7 @@ console.log(transferValue)
         * decodeTransactionReceipt<T>(receipt): DecodeResult<T>[]
         * decodeConstructor<T>(data: string): DecodeResult<T>
         * decodeInput<T>(inputData: string): DecodeResult<T>
+        * decodeInputParams(funcName, inputCode)
         * decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T>
         * decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T>
         * ...Interface

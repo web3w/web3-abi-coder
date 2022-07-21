@@ -1,6 +1,6 @@
 {
   "name": "web3-abi-coder",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "The best ABI Coder tool",
   "main": "lib/index.js",
   "type": "lib/index.d.ts",
@@ -8,14 +8,16 @@
   "scripts": {
     "release": "tsc && npm publish && git tag $npm_package_version && git push --tag",
     "dev:tsc": "tsc -w -p tsconfig.json",
-    "link": "sudo npm link web3-abi-coder"
+    "link": "sudo npm link web3-abi-coder",
+    "deploy": "gh-pages -d example"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.6.3"
   },
   "devDependencies": {
     "ts-node": "~10.7.0",
-    "typescript": "~4.6.4"
+    "typescript": "~4.6.4",
+    "gh-pages": "^4.0.0"
   },
   "publishConfig": {
     "access": "public"

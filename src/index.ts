@@ -1,4 +1,5 @@
 import {AbiCoder, Fragment, Interface, JsonFragment} from "@ethersproject/abi";
+import {arrayify, concat, hexlify} from "@ethersproject/bytes";
 
 export type {Fragment, JsonFragment}
 
@@ -21,10 +22,10 @@ export function bnToString(obj: object) {
                     // @ts-ignore
                     items.push(item.toString())
                 } else {
-                    if(typeof item == 'string' || typeof item == 'number'){
+                    if (typeof item == 'string' || typeof item == 'number') {
                         // @ts-ignore
                         items.push(item)
-                    }else {
+                    } else {
                         // @ts-ignore
                         items.push(bnToString(item))
                     }
@@ -127,12 +128,28 @@ export class Web3ABICoder extends Interface {
         return this.encodeFunctionData(nameOrSighash, inputs)
     }
 
+    encodeInputParams(nameOrSighash: string, values: any[]): string {
+        const functionFragment = this.getFunction(nameOrSighash);
+        return hexlify(
+            this._encodeParams(functionFragment.inputs, values || [])
+        );
+    }
+
     decodeInput<T>(inputData: string): DecodeResult<T> {
         if (inputData.length < 10) throw new Error("Input data is incorrect: " + inputData)
         const sighash = inputData.substring(0, 10)
         const func = this.getFunction(sighash)
         if (!func) throw new Error("The ABI has no matching function:" + sighash)
         const decodeData = this.decodeFunctionData(func.name, inputData)
+        const values = bnToString(decodeData);
+        return {name: func.name, type: func.type, values: <T>values}
+    }
+
+    decodeInputParams<T>(nameOrSighash: string, paramsData: string): DecodeResult<T> {
+        const func = this.getFunction(nameOrSighash)
+        if (!func) throw new Error("The ABI has no matching function:" + nameOrSighash)
+        const bytes = arrayify(paramsData);
+        const decodeData = this._decodeParams(func.inputs, bytes);
         const values = bnToString(decodeData);
         return {name: func.name, type: func.type, values: <T>values}
     }
