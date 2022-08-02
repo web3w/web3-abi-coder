@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/web3-abi/static/css/main.cbfe2163.css",
-    "main.js": "/web3-abi/static/js/main.6ec25b78.js",
-    "index.html": "/web3-abi/index.html",
-    "main.cbfe2163.css.map": "/web3-abi/static/css/main.cbfe2163.css.map",
-    "main.6ec25b78.js.map": "/web3-abi/static/js/main.6ec25b78.js.map"
+    "main.css": "/web3-abi-coder/static/css/main.cbfe2163.css",
+    "main.js": "/web3-abi-coder/static/js/main.af5bbe3c.js",
+    "index.html": "/web3-abi-coder/index.html",
+    "main.cbfe2163.css.map": "/web3-abi-coder/static/css/main.cbfe2163.css.map",
+    "main.af5bbe3c.js.map": "/web3-abi-coder/static/js/main.af5bbe3c.js.map"
   },
   "entrypoints": [
     "static/css/main.cbfe2163.css",
-    "static/js/main.6ec25b78.js"
+    "static/js/main.af5bbe3c.js"
   ]
 }
