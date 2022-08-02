@@ -81,57 +81,29 @@ function addZero(m) {
     return m < 10 ? '0' + m : m;
 }
 
-// https://api.shasta.trongrid.io/v1/accounts/TNETu5nHBrrReq9m6fawdjUASFdLarWmC4/transactions/trc20?only_from=true&limit=50&only_confirmed=true
-// https://cn.developers.tron.network/reference/get-trc20-transaction-info-by-account-address
 export const getEventLogs = async (page, formData, host) => {
-    // console.log(host)
-    if (!formData.account) throw new Error("eventLogs account undefined")
-    let query = `only_from=true&limit=50&only_confirmed=true`
-    if (formData.trc20) {
-        query += '&contract_address=' + formData.trc20
-    }
-    if (formData.dateRange) {
-        const start = formData.dateRange[0].valueOf()
-        const end = formData.dateRange[1].valueOf()
-        query += `&min_timestamp=${start}&max_timestam=p${end}`
-    }
-
-    let url = `${host}/v1/accounts/${formData.account}/transactions/trc20?${query}`
-    console.log("Account query:", url)
-
-    const pageIndexStr = window.sessionStorage.getItem("pageIndex")
-
-    if (pageIndexStr) {
-        const pageIndex = JSON.parse(pageIndexStr)
-        if (pageIndex.links && pageIndex.links.next) {
-            url = pageIndex.links.next
-        } else {
-            window.sessionStorage.removeItem("pageIndex")
-        }
-    }
-
-    const res = await fetch(url)
+    const res ={}// await wallet.getTransactionReceipt()
     const data = []
     if (res.ok) {
-        const resData = await res.json()
-        if (resData.success === true && resData.meta) {
-            window.sessionStorage.setItem("pageIndex", JSON.stringify(resData.meta))
-        }
-        if (resData.success) {
-            resData.data.forEach(val => {
-                //name, address,
-                const {decimals, symbol} = val.token_info
-                data.push({
-                    time: val.block_timestamp,
-                    from: val.from,
-                    to: val.to,
-                    value: (val.value / Math.pow(10, decimals)).toFixed(4),
-                    symbol: symbol,
-                    type: val.type,
-                    txId: val.transaction_id
-                })
-            })
-        }
+        // const resData = await res.json()
+        // if (resData.success === true && resData.meta) {
+        //     window.sessionStorage.setItem("pageIndex", JSON.stringify(resData.meta))
+        // }
+        // if (resData.success) {
+        //     resData.data.forEach(val => {
+        //         //name, address,
+        //         const {decimals, symbol} = val.token_info
+        //         data.push({
+        //             time: val.block_timestamp,
+        //             from: val.from,
+        //             to: val.to,
+        //             value: (val.value / Math.pow(10, decimals)).toFixed(4),
+        //             symbol: symbol,
+        //             type: val.type,
+        //             txId: val.transaction_id
+        //         })
+        //     })
+        // }
     }
 
     return {
@@ -146,7 +118,7 @@ export const delay = (n) => {
         setTimeout(resolve, n * 1000);
     });
 }
- 
+
 export const exportsCSV = (_headers = [], _body = [], name = 'csv') => {
     const headers = [_headers.join()] // 格式化表头
     const body = _body.map(item => { // 格式化表内容

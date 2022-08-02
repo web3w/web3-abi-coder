@@ -1,5 +1,6 @@
 import {AbiCoder, Fragment, Interface, JsonFragment} from "@ethersproject/abi";
 import {arrayify, concat, hexlify} from "@ethersproject/bytes";
+import pkg from "../package.json"
 
 export type {Fragment, JsonFragment}
 
@@ -53,6 +54,7 @@ export type DecodeResult<T> = { name?: string, type: string, hash?: string, valu
 
 export class Web3ABICoder extends Interface {
     public abiCode: AbiCoder
+    public version = pkg.version
 
     constructor(abi: ReadonlyArray<Fragment | JsonFragment>) {
         super(abi);
@@ -107,21 +109,36 @@ export class Web3ABICoder extends Interface {
     // const seaEvent = seaportCoder.getEvent(seaportlog.topics[0])
 
     decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T> {
-        if (log.topics.length < 2) throw new Error("Topics data is incorrect: " + log.topics)
-        const topicId = log.topics[0]
-        const event = this.getEvent(topicId)
-        if (!event) throw new Error("The ABI has no matching function:" + topicId)
+        if (log.topics.length == 0) throw new Error("Topics data is incorrect: " + log.topics)
 
-        if (log.data == "0x") {
-            event.inputs.forEach((val, index) => {
-                if (!val.indexed) {
-                    log.data = log.topics[index + 1]
-                }
-            })
+        if (log.topics.length == 1 && log.topics[0] == "0x6ef95f06320e7a25a04a175ca677b7052bdd97131872c2192525a629f51be770") {
+            // return PaymentReceived(address,uint256)
+            const data = this.abiCode.decode(["address", "uint256"], log.data)
+            const values = <T><unknown>{
+                account: data[0],
+                value: data[1].toString()
+            }
+            return {name: "PaymentReceived", type: "event", values}
         }
-        const decodeData = this.decodeEventLog(event, log.data, log.topics)
-        const values = bnToString(decodeData)
-        return {name: event.name, type: event.type, values: <T>values}
+        const topicId = log.topics[0]
+
+
+        try {
+            const event = this.getEvent(<string>topicId)
+            if (log.data == "0x") {
+                event.inputs.forEach((val, index) => {
+                    if (!val.indexed) {
+                        log.data = log.topics[index + 1]
+                    }
+                })
+            }
+            const decodeData = this.decodeEventLog(event, log.data, log.topics)
+            const values = bnToString(decodeData)
+            return {name: event.name, type: event.type, values: <T>values}
+        } catch (e) {
+            return {name: "Error", type: "undecoded", values: <T><unknown>{topics: log.topics, data: log.data}}
+        }
+
     }
 
     encodeInput(nameOrSighash: string, inputs: any[]): string {

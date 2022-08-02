@@ -1,6 +1,7 @@
 import React, {createContext, useEffect, useState} from "react";
 import {message, Modal, Spin} from "antd";
-import {detectWallets} from "web3-wallets";
+// import {detectWallets} from "web3-wallets";
+import {Web3Wallets} from 'web3-wallets';
 
 const installWallet = () => {
     Modal.info({
@@ -42,34 +43,24 @@ const unlockWallet = () => {
 
 export const Context = createContext({});
 export const AppContext = ({children}) => {
-    debugger
-    const {metamask} = detectWallets()
-    const [trc20s, setTrc20s] = useState()
-    const [scanUrl, setScanUrl] = useState()
+    const [wallet, setWallet] = useState({})
+    const [account, setAccount] = useState({})
 
     useEffect(() => {
         async function fetchData() {
+            // if(wallet.version) return
+            const metamask = new Web3Wallets({name: "metamask"})//detectWallets()
             console.log("AppContext: wallet init")
-            // tronWeb = window.ethereum
+
             if (!metamask) {
                 installWallet()
-                throw new Error("Tron web not exist")
+                throw new Error("Wallet not exist")
             }
-            const data = await metamask.enable()
-
+            const data = await metamask.connect()
+            setWallet(metamask)
             if (data) {
-                const address = data[0]
-                //https://cn.developers.tron.network/reference/getaccount
-                // const account = await tronWeb.trx.getAccount(address).catch(err => {
-                //     message.error('GetAccount fail，Please refresh the page.');
-                // })
-                // account.address = address
-                // const scanUrl = chainScanInfo[nodeHost]
-                // setScanUrl(scanUrl)
-                // const trc20s = chainTrc20s[network]
-                // setTrc20s(trc20s)
-            } else {
-
+                const balance =await metamask.walletSigner.getBalance()
+                setAccount({balance, address: data[0]})
             }
         }
 
@@ -78,9 +69,9 @@ export const AppContext = ({children}) => {
             message.error('Get account info fail，Please refresh the page.');
             throw err
         });
-    }, []);
+    },[]);
     return (
-        <Context.Provider value={{wallet: metamask}}>
+        <Context.Provider value={{wallet, account}}>
             {children}
         </Context.Provider>
     )

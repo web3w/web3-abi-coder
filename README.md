@@ -3,6 +3,8 @@
 
 Utils that encodes and decodes transactions and logs for evm.
 
+https://web3w.github.io/web3-abi-coder/
+
 ## Motivation
 
 To solve the problem of unreadable web3.js and Ethers decoder data.
@@ -217,7 +219,3 @@ console.log(transferValue)
     * encoding
         * encodeInput(nameOrSighash: string, inputs: any[])
         * ...Interface
-* Rpc function
-    * async function getBlockByNumber(blockNum: number, url?: string)
-    * async function getTransactionByHash(txHash: string, url?: string)
-    * async function getTransactionReceipt(txHash: string, url?: string)
