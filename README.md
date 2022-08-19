@@ -219,3 +219,6 @@ console.log(transferValue)
     * encoding
         * encodeInput(nameOrSighash: string, inputs: any[])
         * ...Interface
+    * utils
+        * get4Bytes
+        * getTransferEvents

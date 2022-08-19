@@ -1,21 +1,9 @@
 //// const res = await fetch('https://api.belo.app/public/price');
 
+import {fetchRPC} from "./utils";
 
-export async function fetchRPC(url: string, body: string) {
-    const res = await fetch(url, {
-            method: 'POST',
-            body,
-            headers: {'Content-Type': 'application/json'}
-        }
-    );
-    if (res.ok) {
-        return res.json();
-    } else {
-        throw new Error("Fatch Error")
-    }
-}
+const rpcUrl = "https://eth-mainnet.improd.works"
 
-const rpcUrl = "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 
 export async function getBlockByNumber(blockNum: number, url?: string) {
     const blockHex = "0x" + blockNum.toString(16)
@@ -46,4 +34,33 @@ export async function getTransactionReceipt(txHash: string, url?: string) {
         "id": new Date().getTime()
     }
     return fetchRPC(url || rpcUrl, JSON.stringify(getReceipt))
+}
+
+export interface LimitedCallSpec {
+    to: string;
+    data: string;
+    value?: string;
+    from?: string;
+}
+
+export async function estimateGas(callData: LimitedCallSpec,url?: string, ) {
+    if (callData.value && callData.value.toString().substr(0, 2) != '0x') {
+        callData.value = '0x' + Number(callData.value.toString()).toString(16)
+    }
+    if(!callData.from){
+        //https://etherscan.io/accounts
+        callData.from ="0xda9dfa130df4de4673b89022ee50ff26f6ea73cf"
+    }
+    const estimate = {
+        "jsonrpc": "2.0",
+        "method": "eth_estimateGas",
+        "params": [callData, 'latest'],
+        "id": new Date().getTime()
+    }
+    const gasData = await fetchRPC(url || rpcUrl, JSON.stringify(estimate))
+    if (gasData.result) {
+        return Number(gasData.result).toString()
+    } else {
+        throw gasData.error
+    }
 }

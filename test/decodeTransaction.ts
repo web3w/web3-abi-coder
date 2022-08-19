@@ -1,8 +1,6 @@
 //
-import {Web3ABICoder} from "../src/index";
 import Seaport from "./abi/Seaport.json"
-import {ERC721Coder} from "../index";
-import {getTransactionByHash, getTransactionReceipt} from "../src/rpc";
+import {ERC721Coder,getTransactionByHash,Web3ABICoder, getTransactionReceipt} from "../index";
 
 (async () => {
     const txHash = "0xbfe24528d5e90822924687d28d55dc492a65660d205c5619d8116780c69497f6"

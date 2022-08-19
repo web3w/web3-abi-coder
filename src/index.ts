@@ -1,6 +1,7 @@
 import {AbiCoder, Fragment, Interface, JsonFragment} from "@ethersproject/abi";
 import {arrayify, concat, hexlify} from "@ethersproject/bytes";
 import pkg from "../package.json"
+import {estimateGas} from "./ethRPC";
 
 export type {Fragment, JsonFragment}
 
@@ -106,8 +107,6 @@ export class Web3ABICoder extends Interface {
         }))
     }
 
-    // const seaEvent = seaportCoder.getEvent(seaportlog.topics[0])
-
     decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T> {
         if (log.topics.length == 0) throw new Error("Topics data is incorrect: " + log.topics)
 
@@ -196,7 +195,6 @@ export class Web3ABICoder extends Interface {
         return this.decodeInput(transaction.input)
     }
 
-
     decodeTransactionReceipt<T>(receipt): DecodeResult<T>[] {
         const evetns = this.getEvents()
         const validLogs = receipt.logs.filter(log => {
@@ -219,6 +217,16 @@ export class Web3ABICoder extends Interface {
         const params = this.abiCode.decode(this.deploy.inputs, data)
         const values = <T>bnToString(params)
         return {name: "", type: 'constructor', values};
+    }
+
+    static async getHexCodeGas(data: {
+        to: string,
+        hexCode: string,
+        value?: string
+        url?: string
+    }) {
+        const {to, hexCode, value, url} = data
+        return estimateGas({to, data: hexCode, value}, url)
     }
 
 }
