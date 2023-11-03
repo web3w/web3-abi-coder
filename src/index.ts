@@ -1,9 +1,9 @@
-import {AbiCoder, Fragment, Interface, JsonFragment} from "@ethersproject/abi";
-import {arrayify, concat, hexlify} from "@ethersproject/bytes";
+import { AbiCoder, Fragment, Interface, JsonFragment } from "@ethersproject/abi";
+import { arrayify, concat, hexlify } from "@ethersproject/bytes";
 import pkg from "../package.json"
-import {estimateGas} from "./ethRPC";
+import { estimateGas } from "./ethRPC";
 
-export type {Fragment, JsonFragment}
+export type { Fragment, JsonFragment }
 
 export function bnToString(obj: object) {
     let res = {}
@@ -53,7 +53,7 @@ export function bnToString(obj: object) {
 
 export type DecodeResult<T> = { name?: string, type: string, hash?: string, values: T }
 
-export class Web3ABICoder extends Interface {
+export default class Web3ABICoder extends Interface {
     public abiCode: AbiCoder
     public version = pkg.version
 
@@ -117,7 +117,7 @@ export class Web3ABICoder extends Interface {
                 account: data[0],
                 value: data[1].toString()
             }
-            return {name: "PaymentReceived", type: "event", values}
+            return { name: "PaymentReceived", type: "event", values }
         }
         const topicId = log.topics[0]
 
@@ -133,9 +133,9 @@ export class Web3ABICoder extends Interface {
             }
             const decodeData = this.decodeEventLog(event, log.data, log.topics)
             const values = bnToString(decodeData)
-            return {name: event.name, type: event.type, values: <T>values}
+            return { name: event.name, type: event.type, values: <T>values }
         } catch (e) {
-            return {name: "Error", type: "undecoded", values: <T><unknown>{topics: log.topics, data: log.data}}
+            return { name: "Error", type: "undecoded", values: <T><unknown>{ topics: log.topics, data: log.data } }
         }
 
     }
@@ -158,7 +158,7 @@ export class Web3ABICoder extends Interface {
         if (!func) throw new Error("The ABI has no matching function:" + sighash)
         const decodeData = this.decodeFunctionData(func.name, inputData)
         const values = bnToString(decodeData);
-        return {name: func.name, type: func.type, values: <T>values}
+        return { name: func.name, type: func.type, values: <T>values }
     }
 
     decodeInputParams<T>(nameOrSighash: string, paramsData: string): DecodeResult<T> {
@@ -167,7 +167,7 @@ export class Web3ABICoder extends Interface {
         const bytes = arrayify(paramsData);
         const decodeData = this._decodeParams(func.inputs, bytes);
         const values = bnToString(decodeData);
-        return {name: func.name, type: func.type, values: <T>values}
+        return { name: func.name, type: func.type, values: <T>values }
     }
 
     decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T> {
@@ -175,7 +175,7 @@ export class Web3ABICoder extends Interface {
         if (!func) throw new Error("The ABI has no matching function:")
         const decodeData = this.decodeFunctionResult(func.name, outputData)
         const values = bnToString(decodeData)
-        return {name: func.name, type: func.type, values: <T>values}
+        return { name: func.name, type: func.type, values: <T>values }
     }
 
     decodeBlock<T>(block): DecodeResult<T>[] {
@@ -188,7 +188,7 @@ export class Web3ABICoder extends Interface {
                 return false
             }
         })
-        return validInputs.map(tx => ({...this.decodeInput(tx.input), hash: tx.hash}))
+        return validInputs.map(tx => ({ ...this.decodeInput(tx.input), hash: tx.hash }))
     }
 
     decodeTransaction<T>(transaction): DecodeResult<T> {
@@ -206,7 +206,7 @@ export class Web3ABICoder extends Interface {
             }
         })
 
-        return validLogs.map(log => ({...this.decodeLog(log), hash: log.transactionHash}))
+        return validLogs.map(log => ({ ...this.decodeLog(log), hash: log.transactionHash }))
     }
 
     decodeConstructor<T>(data: string): DecodeResult<T> {
@@ -216,7 +216,7 @@ export class Web3ABICoder extends Interface {
         }
         const params = this.abiCode.decode(this.deploy.inputs, data)
         const values = <T>bnToString(params)
-        return {name: "", type: 'constructor', values};
+        return { name: "", type: 'constructor', values };
     }
 
     static async getHexCodeGas(data: {
@@ -225,8 +225,8 @@ export class Web3ABICoder extends Interface {
         value?: string
         url?: string
     }) {
-        const {to, hexCode, value, url} = data
-        return estimateGas({to, data: hexCode, value}, url)
+        const { to, hexCode, value, url } = data
+        return estimateGas({ to, data: hexCode, value }, url)
     }
 
 }

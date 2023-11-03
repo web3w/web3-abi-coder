@@ -1,18 +1,22 @@
 export async function fetchUrl(url: string) {
     const res = await fetch(url);
     if (res.ok) {
-        return res.json();
+        return res.text();
     } else {
         throw new Error("Fatch Error")
     }
 }
 
 ;(async () => {
-   const res1 = await fetchUrl('https://api.belo.app/public/price');
 
-    const nn =await fetchUrl("https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/a9059cbb")
+    const nn =await fetchUrl("https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/82ad56cb")
 
     console.log(nn)
+    
+   const res1 = await fetchUrl('https://api.belo.app/public/price');
+
+    const nn1 =await fetchUrl("https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/a9059cbb")
+   
     // 合并两升序列表 https://blog.51cto.com/u_15055361/5536887
     const l1 = [1, 2, 4], l2 = [3, 3, 4]
     for (let i = 0; i < l1.length; i++) {
