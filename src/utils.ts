@@ -106,6 +106,8 @@ export async function getTenderlyGas(data: { input: string, to: string, from: st
         if (!refund_gas) throw new Error('GetTenderlyGas error')
         return gas_used + refund_gas;
     } else {
+        console.log(res.status)
+        console.log(res.statusText)
         throw new Error("Fatch Error")
     }
 }
