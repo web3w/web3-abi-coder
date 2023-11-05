@@ -9,7 +9,7 @@ export async function fetchUrl(url: string) {
 
 ;(async () => {
 
-    const nn =await fetchUrl("https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/82ad56cb")
+    const nn =await fetchUrl("https://raw.githubusercontent.com/ethereum-lists/4bytes/master/signatures/0xb3c05b1d")
 
     console.log(nn)
     
