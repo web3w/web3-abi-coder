@@ -1,9 +1,8 @@
 # Web3 ABI Coder
 
-
 Utils that encodes and decodes transactions and logs for evm.
 
-https://web3w.github.io/web3-abi-coder/
+<https://web3w.github.io/web3-abi-coder/>
 
 ## Motivation
 
@@ -130,8 +129,9 @@ console.log(coder.decodeTransactionReceipt(receipt))
 ```
 
 ### decodeInput
+
 ```ts
-import {Web3ABICoder, ERC20Coder} from 'web3-abi-coder';
+import Web3ABICoder,{ ERC20Coder} from 'web3-abi-coder';
 import Seaport from "./abi/Seaport.json"
 
 const seaCoder = new Web3ABICoder(Seaport.abi)
@@ -194,31 +194,31 @@ console.log(transferValue)
 ## API
 
 * Web3ABICoder(abi) extends Interface
-    * abi
-        * ERC20ABI,ERC721,ERC1155
-        * addABI(abi: ReadonlyArray<Fragment | JsonFragment>): Web3ABICoder
-        * ...abiCoder
-    * utils
-        * getFunctionName(sighash: string):string
-        * getFunctionSelector(name: string): { name: string, signature: string, sighash: string }[]
-        * getFunctionSelectors(): { name: string, signature: string, sighash: string }[]
-        * getFunctionSignature(name: string, type?: "minimal" | "json" | "full"): string[]
-        * getEvent(nameOrSignatureOrTopic: string): EventFragment
-        * getEvents(): { name: string, signature: string, topic: string }
-        * ...Interface
-    * decoding
-        * decodeBlock<T>(block): DecodeResult<T>[]
-        * decodeTransaction<T>(transaction): DecodeResult<T>[]
-        * decodeTransactionReceipt<T>(receipt): DecodeResult<T>[]
-        * decodeConstructor<T>(data: string): DecodeResult<T>
-        * decodeInput<T>(inputData: string): DecodeResult<T>
-        * decodeInputParams(funcName, inputCode)
-        * decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T>
-        * decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T>
-        * ...Interface
-    * encoding
-        * encodeInput(nameOrSighash: string, inputs: any[])
-        * ...Interface
-    * utils
-        * get4Bytes
-        * getTransferEvents
+  * abi
+    * ERC20ABI,ERC721,ERC1155
+    * addABI(abi: ReadonlyArray<Fragment | JsonFragment>): Web3ABICoder
+    * ...abiCoder
+  * utils
+    * getFunctionName(sighash: string):string
+    * getFunctionSelector(name: string): { name: string, signature: string, sighash: string }[]
+    * getFunctionSelectors(): { name: string, signature: string, sighash: string }[]
+    * getFunctionSignature(name: string, type?: "minimal" | "json" | "full"): string[]
+    * getEvent(nameOrSignatureOrTopic: string): EventFragment
+    * getEvents(): { name: string, signature: string, topic: string }
+    * ...Interface
+  * decoding
+    * decodeBlock<T>(block): DecodeResult<T>[]
+    * decodeTransaction<T>(transaction): DecodeResult<T>[]
+    * decodeTransactionReceipt<T>(receipt): DecodeResult<T>[]
+    * decodeConstructor<T>(data: string): DecodeResult<T>
+    * decodeInput<T>(inputData: string): DecodeResult<T>
+    * decodeInputParams(funcName, inputCode)
+    * decodeLog<T>(log: { topics: string[], data: string }): DecodeResult<T>
+    * decodeOutput<T>(nameOrSighash: string, outputData: string): DecodeResult<T>
+    * ...Interface
+  * encoding
+    * encodeInput(nameOrSighash: string, inputs: any[])
+    * ...Interface
+  * utils
+    * get4Bytes
+    * getTransferEvents
